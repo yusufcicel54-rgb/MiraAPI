@@ -1,0 +1,33 @@
+name: Build Mira Mod
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Canın istediğinde GitHub arayüzünden tek tuşla başlatabilmen için
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repoyu Klonla
+      uses: actions/checkout@v4
+
+    - name: .NET Kurulumu
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' # Eğer template .NET 6 istiyorsa burayı 6.0.x yaparsın
+
+    - name: Bağımlılıkları Çek (Restore)
+      run: dotnet restore
+
+    - name: Modu Derle (Build)
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Çıkan DLL'i Paketle ve Yükle
+      uses: actions/upload-artifact@v4
+      with:
+        name: MiraMod-Build
+        path: "**/bin/Release/**/*.dll"
